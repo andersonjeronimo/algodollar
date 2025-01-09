@@ -1,0 +1,2 @@
+# algodollar
+Stablecoin project.
