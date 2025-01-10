@@ -3,32 +3,66 @@ pragma solidity ^0.8.28;
 
 // Uncomment this line to use console.log
 // import "hardhat/console.sol";
+import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
+import "./IOracle.sol";
 
-contract WeiUsdOracle {
-    uint public unlockTime;
-    address payable public owner;
+contract WeiUsdOracle is IOracle, Ownable {
 
-    event Withdrawal(uint amount, uint when);
+    uint public constant ETH_IN_WEI = 10 ** 18;
+    uint private lastRatio = 0;
+    uint private lastUpdate = 0;
+    address[] subscribers;
 
-    constructor(uint _unlockTime) payable {
-        require(
-            block.timestamp < _unlockTime,
-            "Unlock time should be in the future"
-        );
-
-        unlockTime = _unlockTime;
-        owner = payable(msg.sender);
+    constructor(uint ethPriceInPenny) Ownable(msg.sender) {        
+        lastRatio = calcWeiPennyRatio(ethPriceInPenny);
+        lastUpdate = block.timestamp;
     }
 
-    function withdraw() public {
-        // Uncomment this line, and the import of "hardhat/console.sol", to print a log in your terminal
-        // console.log("Unlock time is %o and block timestamp is %o", unlockTime, block.timestamp);
+    function calcWeiPennyRatio(uint ethPriceInPenny) internal pure returns (uint) {
+        return (ETH_IN_WEI / ethPriceInPenny);
+    }    
 
-        require(block.timestamp >= unlockTime, "You can't withdraw yet");
-        require(msg.sender == owner, "You aren't the owner");
+    function setEthPrice(uint ethPriceInPenny) external {
+        require(ethPriceInPenny > 0, "ETH price cannot be zero");
+        uint weisPerPenny = calcWeiPennyRatio(ethPriceInPenny);
+        require(weisPerPenny > 0, "Wei/penny ratio cannot be zero");
 
-        emit Withdrawal(address(this).balance, block.timestamp);
-
-        owner.transfer(address(this).balance);
+        lastRatio = weisPerPenny;
+        lastUpdate = block.timestamp;
     }
+
+    function getWeiRatio() external view returns (uint){
+        return lastRatio;
+    }
+
+    function subscribe(address subscriber) external onlyOwner{
+        require(subscriber != address(0), "Invalid subscriber address");
+        emit Subscribed(subscriber);
+        for (uint i = 0; i < subscribers.length; i++) {
+            if (subscribers[i] == subscriber) {                
+                return;
+            }
+        }
+        for (uint i = 0; i < subscribers.length; i++) {
+            if (subscribers[i] == address(0)) {
+                subscribers[i] = subscriber;
+                return;
+            }
+        }
+        subscribers.push(subscriber);
+    }
+
+    function unsubscribe(address subscriber) external onlyOwner{
+        require(subscriber != address(0), "Invalid subscriber address");
+        for (uint i = 0; i < subscribers.length; i++) {
+            if (subscribers[i] == subscriber) {
+                delete subscribers[i];
+                emit Unsubscribed(subscriber);
+                return;
+            }
+        }
+    }
+
+
+    
 }

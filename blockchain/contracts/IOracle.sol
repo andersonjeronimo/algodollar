@@ -6,7 +6,7 @@ interface IOracle {
     event Unsubscribed(address indexed subscriber);
     event AllUpdated(address[] subscribers);
 
-    function setEthPrice(uint weisPerPenny) external;
+    function setEthPrice(uint ethPriceInPenny) external;
 
     function getWeiRatio() external view returns (uint);
 
