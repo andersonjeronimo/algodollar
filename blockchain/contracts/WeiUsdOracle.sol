@@ -4,23 +4,25 @@ pragma solidity ^0.8.28;
 // Uncomment this line to use console.log
 // import "hardhat/console.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
-import "./IOracle.sol";
+import "./Subject.sol";
+import "./Observer.sol";
 
-contract WeiUsdOracle is IOracle, Ownable {
-
+contract WeiUsdOracle is Subject, Ownable {
     uint public constant ETH_IN_WEI = 10 ** 18;
     uint private lastRatio = 0;
     uint private lastUpdate = 0;
     address[] subscribers;
 
-    constructor(uint ethPriceInPenny) Ownable(msg.sender) {        
+    constructor(uint ethPriceInPenny) Ownable(msg.sender) {
         lastRatio = calcWeiPennyRatio(ethPriceInPenny);
         lastUpdate = block.timestamp;
     }
 
-    function calcWeiPennyRatio(uint ethPriceInPenny) internal pure returns (uint) {
+    function calcWeiPennyRatio(
+        uint ethPriceInPenny
+    ) internal pure returns (uint) {
         return (ETH_IN_WEI / ethPriceInPenny);
-    }    
+    }
 
     function setEthPrice(uint ethPriceInPenny) external {
         require(ethPriceInPenny > 0, "ETH price cannot be zero");
@@ -29,17 +31,19 @@ contract WeiUsdOracle is IOracle, Ownable {
 
         lastRatio = weisPerPenny;
         lastUpdate = block.timestamp;
+
+        notify();
     }
 
-    function getWeiRatio() external view returns (uint){
+    function getWeiRatio() external view returns (uint) {
         return lastRatio;
     }
 
-    function subscribe(address subscriber) external onlyOwner{
+    function register(address subscriber) external onlyOwner {
         require(subscriber != address(0), "Invalid subscriber address");
         emit Subscribed(subscriber);
         for (uint i = 0; i < subscribers.length; i++) {
-            if (subscribers[i] == subscriber) {                
+            if (subscribers[i] == subscriber) {
                 return;
             }
         }
@@ -52,7 +56,7 @@ contract WeiUsdOracle is IOracle, Ownable {
         subscribers.push(subscriber);
     }
 
-    function unsubscribe(address subscriber) external onlyOwner{
+    function unregister(address subscriber) external onlyOwner {
         require(subscriber != address(0), "Invalid subscriber address");
         for (uint i = 0; i < subscribers.length; i++) {
             if (subscribers[i] == subscriber) {
@@ -63,6 +67,16 @@ contract WeiUsdOracle is IOracle, Ownable {
         }
     }
 
-
-    
+    function notify() internal {
+        uint count = 0;
+        for (uint i = 0; i < subscribers.length; i++) {
+            if (subscribers[i] != address(0)) {
+                Observer(subscribers[i]).updtate(lastRatio);
+                count++;
+            }
+        }
+        if (count > 0) {
+            emit AllUpdated(subscribers);
+        }
+    }
 }

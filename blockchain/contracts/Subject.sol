@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.28;
 
-interface IOracle {
+interface Subject {
     event Subscribed(address indexed subscriber);
     event Unsubscribed(address indexed subscriber);
     event AllUpdated(address[] subscribers);
@@ -10,7 +10,7 @@ interface IOracle {
 
     function getWeiRatio() external view returns (uint);
 
-    function subscribe(address subscriber) external;
+    function register(address subscriber) external;
 
-    function unsubscribe(address subscriber) external;
+    function unregister(address subscriber) external;    
 }
