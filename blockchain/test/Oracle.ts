@@ -2,7 +2,7 @@ import { loadFixture } from "@nomicfoundation/hardhat-toolbox/network-helpers";
 import { expect } from "chai";
 import hre from "hardhat";
 
-describe("WeiUsdOracle", function () {
+describe("Oracle", function () {
   // We define a fixture to reuse the same setup in every test.
   // We use loadFixture to run this setup once, snapshot that state,
   // and reset Hardhat Network to that snapshot in every test.
@@ -10,7 +10,7 @@ describe("WeiUsdOracle", function () {
     // Contracts are deployed using the first signer/account by default
     const [owner, otherAccount] = await hre.ethers.getSigners();
 
-    const Oracle = await hre.ethers.getContractFactory("WeiUsdOracle");
+    const Oracle = await hre.ethers.getContractFactory("Oracle");
     //const EtherToWei =  hre.ethers.parseUnits("1", "ether");
     //ETH price in 11/01/2025 ~ $3,000.00 USD
     //Ethereum price in pennys = 2000 * 100

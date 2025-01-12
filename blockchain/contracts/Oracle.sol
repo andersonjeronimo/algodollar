@@ -7,7 +7,7 @@ import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import "./Subject.sol";
 import "./Observer.sol";
 
-contract WeiUsdOracle is Subject, Ownable {
+contract Oracle is Subject, Ownable {
     uint public constant ETH_IN_WEI = 10 ** 18;
     uint private lastRatio = 0;
     uint private lastUpdate = 0;
