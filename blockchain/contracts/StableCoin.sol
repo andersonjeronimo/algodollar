@@ -12,6 +12,7 @@ contract StableCoin is ERC20, IStableCoin, Ownable {
     constructor() ERC20("AlgoDollar", "USDA") Ownable(msg.sender) {}
 
     function setRebase(address newRebase) external onlyOwner {
+        require(newRebase != address(0), "Invalid rebase address (zero address)");
         rebase = newRebase;
     }
 
