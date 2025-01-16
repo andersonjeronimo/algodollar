@@ -2,7 +2,7 @@ import { loadFixture } from "@nomicfoundation/hardhat-toolbox/network-helpers";
 import { expect } from "chai";
 import hre from "hardhat";
 
-describe("Oracle", function () {
+describe("Oracle tests", function () {
   // We define a fixture to reuse the same setup in every test.
   // We use loadFixture to run this setup once, snapshot that state,
   // and reset Hardhat Network to that snapshot in every test.
@@ -17,7 +17,7 @@ describe("Oracle", function () {
     const oracle = await Oracle.deploy(2000 * 100);
 
     const Rebase = await hre.ethers.getContractFactory("Rebase");
-    const rebase = await Rebase.deploy();
+    const rebase = await Rebase.deploy();    
 
     return { oracle, rebase, owner, otherAccount };
   }
@@ -63,11 +63,9 @@ describe("Oracle", function () {
 
     it("Should notify ETH price update", async function () {
       const { oracle, rebase } = await loadFixture(deployFixture);
-      await oracle.register(rebase.target);
+      await oracle.register(rebase.target);      
 
-      expect(await oracle.setEthPrice(400000))
-        .to.emit(oracle, "AllUpdated")
-        .withArgs([rebase.target]);
+      expect(await oracle.setEthPrice(400000)).to.emit(oracle, "AllUpdated").withArgs([rebase.target]);
     });
 
 

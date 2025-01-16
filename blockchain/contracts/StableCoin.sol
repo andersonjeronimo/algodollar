@@ -6,29 +6,15 @@ import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import "./IStableCoin.sol";
 
-contract StableCoin is ERC20, IStableCoin, Ownable {
-    address public rebase;
+contract StableCoin is ERC20, IStableCoin, Ownable {    
 
-    constructor() ERC20("AlgoDollar", "USDA") Ownable(msg.sender) {}
+    constructor() ERC20("AlgoDollar", "USDA") Ownable(msg.sender) {}    
 
-    function setRebase(address newRebase) external onlyOwner {
-        require(newRebase != address(0), "Invalid rebase address (zero address)");
-        rebase = newRebase;
-    }
-
-    function mint(address to, uint256 amount) external onlyAdmin {
+    function mint(address to, uint256 amount) external {
         _mint(to, amount);
     }
 
-    function burn(address from, uint256 amount) external onlyAdmin {
+    function burn(address from, uint256 amount) external {
         _burn(from, amount);
-    }
-
-    modifier onlyAdmin() {
-        require(
-            msg.sender == rebase || msg.sender == owner(),
-            "Only rebase contract / contract owner can make this call"
-        );
-        _;
-    }
+    }    
 }

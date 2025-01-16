@@ -50,10 +50,12 @@ contract Oracle is Subject, Ownable {
         for (uint i = 0; i < subscribers.length; i++) {
             if (subscribers[i] == address(0)) {
                 subscribers[i] = subscriber;
+                Observer(subscriber).updtate(lastRatio);
                 return;
             }
         }
         subscribers.push(subscriber);
+        Observer(subscriber).updtate(lastRatio);
     }
 
     function unregister(address subscriber) external onlyOwner {
