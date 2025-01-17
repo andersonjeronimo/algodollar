@@ -8,10 +8,8 @@ const OracleModule = buildModule("OracleModule", (m) => {
   const oracle = m.contract("Oracle");
   const rebase = m.contract("Rebase");
   const stablecoin = m.contract("StableCoin");
-  m.call(rebase, "pause", []);
-  m.call(rebase, "setOracle", [oracle]);
-  m.call(rebase, "setStablecoin", [stablecoin]);
-  m.call(stablecoin, "setRebase", [rebase]);
+  m.call(rebase, "pause", []);  
+  m.call(rebase, "setStablecoin", [stablecoin]);  
 
   return { oracle, stablecoin, rebase };
 });

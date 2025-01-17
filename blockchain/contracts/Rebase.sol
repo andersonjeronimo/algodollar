@@ -12,22 +12,22 @@ contract Rebase is Observer, Pausable, Ownable {
     address public stablecoin;    
     uint public lastUpdate = 0; //timestamp em segundos
     uint private updtateTolerance = 300; //em segundos
-    uint public weisPerPenny = 0;
+    uint public weiCentRatio = 0;
 
     mapping(address => uint) public ethBalance; // customer => wei balance
 
     constructor() Ownable(msg.sender) { }
 
     function initialize() external payable onlyOwner {
-        require(weisPerPenny > 0, "Rebase must subscribe to an oracle");
-        require(msg.value >= weisPerPenny, "Value cannot be less than wei ratio");
+        require(weiCentRatio > 0, "Rebase must subscribe to an oracle");
+        require(msg.value >= weiCentRatio, "Value cannot be less than wei ratio");
         require(stablecoin != address(0), "Invalid stablecoin address");        
 
         ethBalance[msg.sender] = msg.value;
         //por exemplo: se $0.01 = 100 weis (wei ratio),
         //caso o msg.value for 200 weis,
         //serão mintados 2 tokens (considerando ratio = 100 weis p/ cada U$0.01);
-        IStableCoin(stablecoin).mint(msg.sender, msg.value / weisPerPenny);
+        IStableCoin(stablecoin).mint(msg.sender, msg.value / weiCentRatio);
         lastUpdate = block.timestamp;        
     }
 
@@ -41,7 +41,7 @@ contract Rebase is Observer, Pausable, Ownable {
         stablecoin = _stablecoin;//IStableCoin(newStablecoin);
     }
 
-    function updtate(uint _weisPerPenny) external {        
+    function updtate(uint _weiCentRatio) external {        
         //uint oldSupply = IStableCoin(stablecoin).totalSupply();//ERC20 function
         //TO_DO
         //ajustar o preço
@@ -50,8 +50,8 @@ contract Rebase is Observer, Pausable, Ownable {
         
         //lastUpdate = block.timestamp;
         //emit Updated(block.timestamp, oldSupply, newSupply);
-        emit Updated(block.timestamp, _weisPerPenny);
-        weisPerPenny = _weisPerPenny;
+        emit Updated(block.timestamp, _weiCentRatio);
+        weiCentRatio = _weiCentRatio;
     }
 
     function pause() public onlyOwner {
@@ -63,16 +63,16 @@ contract Rebase is Observer, Pausable, Ownable {
     }    
 
     function deposit() external payable whenNotPaused whenNotOutdated {        
-        require(msg.value >= weisPerPenny, "Insufficient deposit");
+        require(msg.value >= weiCentRatio, "Insufficient deposit");
         ethBalance[msg.sender] += msg.value;
-        uint amountUsda = msg.value / weisPerPenny;
+        uint amountUsda = msg.value / weiCentRatio;        
         //aqui é o momento de cobrar taxas pela emissão dos tokens
         IStableCoin(stablecoin).mint(msg.sender, amountUsda);
     }
 
     function withdrawETH(uint amountEth) external whenNotPaused whenNotOutdated {
         require(ethBalance[msg.sender] >= amountEth, "Insufficient ETH balance");        
-        uint amountUsda = amountEth / weisPerPenny;
+        uint amountUsda = amountEth / weiCentRatio;
         require(IStableCoin(stablecoin).balanceOf(msg.sender) >= amountUsda, "Insufficient USDA balance");
         //tudo ok        
         ethBalance[msg.sender] -= amountEth;
@@ -82,7 +82,7 @@ contract Rebase is Observer, Pausable, Ownable {
 
     function withdrawUSDA(uint amountUsda) external whenNotPaused whenNotOutdated {        
         require(IStableCoin(stablecoin).balanceOf(msg.sender) >= amountUsda, "Insufficient USDA balance");        
-        uint amountEth = weisPerPenny * amountUsda;
+        uint amountEth = weiCentRatio * amountUsda;
         require(ethBalance[msg.sender] >= amountEth, "Insufficient ETH balance");
         //tudo ok        
         ethBalance[msg.sender] -= amountEth;

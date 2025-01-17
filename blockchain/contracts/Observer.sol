@@ -5,5 +5,5 @@ interface Observer {
     event Updated(uint indexed timestamp, uint lastRatio);
     //event Updated(uint indexed timestamp, uint oldSupply, uint newSupply);
 
-    function updtate(uint weisPerPenny) external;
+    function updtate(uint weiCentRatio) external;
 }

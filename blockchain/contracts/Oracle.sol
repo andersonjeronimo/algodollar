@@ -13,23 +13,23 @@ contract Oracle is Subject, Ownable {
     uint private lastUpdate = 0;
     address[] subscribers;
 
-    constructor(uint ethPriceInPenny) Ownable(msg.sender) {
-        lastRatio = calcWeiPennyRatio(ethPriceInPenny);
+    constructor(uint ethPriceInCents) Ownable(msg.sender) {
+        lastRatio = calcWeiCentRatio(ethPriceInCents);
         lastUpdate = block.timestamp;
     }
 
-    function calcWeiPennyRatio(
-        uint ethPriceInPenny
+    function calcWeiCentRatio(
+        uint ethPriceInCents
     ) internal pure returns (uint) {
-        return (ETH_IN_WEI / ethPriceInPenny);
+        return (ETH_IN_WEI / ethPriceInCents);
     }
 
-    function setEthPrice(uint ethPriceInPenny) external {
-        require(ethPriceInPenny > 0, "ETH price cannot be zero");
-        uint weisPerPenny = calcWeiPennyRatio(ethPriceInPenny);
-        require(weisPerPenny > 0, "Wei/penny ratio cannot be zero");
+    function setEthPrice(uint ethPriceInCents) external {
+        require(ethPriceInCents > 0, "ETH price cannot be zero");
+        uint weiCentRatio = calcWeiCentRatio(ethPriceInCents);
+        require(weiCentRatio > 0, "Wei/cent ratio cannot be zero");
 
-        lastRatio = weisPerPenny;
+        lastRatio = weiCentRatio;
         lastUpdate = block.timestamp;
 
         notify();
@@ -55,7 +55,7 @@ contract Oracle is Subject, Ownable {
             }
         }
         subscribers.push(subscriber);
-        Observer(subscriber).updtate(lastRatio);
+        Observer(subscriber).updtate(lastRatio);        
     }
 
     function unregister(address subscriber) external onlyOwner {
