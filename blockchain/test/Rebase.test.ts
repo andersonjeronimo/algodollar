@@ -21,7 +21,7 @@ describe("Rebase tests", function () {
     const stableCoin = await StableCoin.deploy();
 
     const Oracle = await hre.ethers.getContractFactory("Oracle");
-    const oracle = await Oracle.deploy(2000 * 100);//valor arbitrário para testes.
+    const oracle = await Oracle.deploy(ETH_IN_CENTS);//valor arbitrário para testes.
 
     const Rebase = await hre.ethers.getContractFactory("Rebase");
     const rebase = await Rebase.deploy();
