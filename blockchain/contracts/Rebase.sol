@@ -31,6 +31,7 @@ contract Rebase is Observer, Pausable, Ownable {
         //caso o msg.value for 200 weis,
         //serão mintados 2 tokens (considerando ratio = 100 weis p/ cada U$0.01);
         IStableCoin(stablecoin).mint(msg.sender, msg.value / weiCentRatio);
+        adjustSupply();
         lastUpdate = block.timestamp;
     }
 
@@ -49,27 +50,20 @@ contract Rebase is Observer, Pausable, Ownable {
 
     function updtate(uint _weiCentRatio) external {
         weiCentRatio = _weiCentRatio;
-        //TO_DO
-        //ajustar o preço
-        //ajustar o supply
-        uint oldSupply = IStableCoin(stablecoin).totalSupply(); //ERC20 function
-        uint newSupply = adjustSupply();
-        if (newSupply != 0) {
-            lastUpdate = block.timestamp;
-            emit Updated(lastUpdate, oldSupply, newSupply);
-        }
+        lastUpdate = block.timestamp;
+        emit Updated(lastUpdate, weiCentRatio);
     }
 
     // 100 = 1:1, 97 = 0.97, 104 = 1.04, etc...
-    function getParity(uint _weiCentRatio) public view returns (uint) {
-        require(_weiCentRatio > 0, "Rebase must subscribe to an oracle");
+    function getParity() public view returns (uint) {
+        require(weiCentRatio > 0, "Rebase must subscribe to an oracle");
         return
             (IStableCoin(stablecoin).totalSupply() * 100) /
-            (address(this).balance / _weiCentRatio);
+            (address(this).balance / weiCentRatio);
     }
 
-    function adjustSupply() internal returns (uint) {
-        uint parity = getParity(weiCentRatio);
+    function rebase() internal returns (uint) {
+        uint parity = getParity();
         if (parity == 0) {
             _pause();
             return 0;
@@ -90,6 +84,15 @@ contract Rebase is Observer, Pausable, Ownable {
             );
         }
         return IStableCoin(stablecoin).totalSupply();
+    }
+
+    function adjustSupply() internal {
+        uint oldSupply = IStableCoin(stablecoin).totalSupply(); //ERC20 function
+        uint newSupply = rebase();
+        if (newSupply != 0) {
+            lastUpdate = block.timestamp;
+            emit SupplyUpdated(lastUpdate, oldSupply, newSupply);
+        }
     }
 
     function pause() public onlyOwner {
