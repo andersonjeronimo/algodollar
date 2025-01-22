@@ -81,7 +81,7 @@ contract Rebase is Observer, Pausable, Ownable {
                 (IStableCoin(stablecoin).totalSupply() * (parity - 100)) / 100
             );
         }
-        if (parity <= 100) {
+        if (parity < 100) {
             IStableCoin(stablecoin).mint(
                 owner(),
                 (IStableCoin(stablecoin).totalSupply() * (100 - parity)) / 100
