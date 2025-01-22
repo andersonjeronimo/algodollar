@@ -50,6 +50,10 @@ contract Rebase is Observer, Pausable, Ownable {
 
     function updtate(uint _weiCentRatio) external {
         weiCentRatio = _weiCentRatio;
+        uint supply = IStableCoin(stablecoin).totalSupply();
+        if (supply != 0) {
+            adjustSupply();
+        }
         lastUpdate = block.timestamp;
         emit Updated(lastUpdate, weiCentRatio);
     }

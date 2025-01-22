@@ -27,7 +27,7 @@ describe("Algodollar tests", function () {
         const rebase = await Rebase.deploy();
 
         //configs 
-        //await rebase.setStablecoin(stableCoin.target);
+        await rebase.setStablecoin(stableCoin.target);
         //await oracle.register(rebase.target);
         //await rebase.initialize({ value: ONE_ETH });
 
