@@ -48,8 +48,8 @@ describe("Algodollar tests", function () {
 
         it("Should set the ETH price", async function () {
             const { oracle } = await loadFixture(deployFixture);
-            await oracle.setEthPrice(400000);//4000 = ETH_IN_CENTS
-            expect(await oracle.getWeiRatio()).to.equal(String(ETH_IN_WEI / 400000));
+            await oracle.setEthPrice(ETH_IN_CENTS);//4000 = ETH_IN_CENTS
+            expect(await oracle.getWeiRatio()).to.equal(String(ETH_IN_WEI / ETH_IN_CENTS));
         });
 
         it("Should register a subscriber", async function () {

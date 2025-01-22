@@ -82,6 +82,30 @@ describe("Algodollar tests", function () {
       expect(await rebase.getParity()).to.equal(100);
     });
 
+    it("Should adjust supply down", async function () {
+      const { rebase, stableCoin, oracle } = await loadFixture(deployFixture);
+
+      await rebase.deposit({ value: ONE_ETH });
+      const oldSupply = await stableCoin.totalSupply();
+      await oracle.setEthPrice(ETH_IN_CENTS * 0.95); //-5%
+      const newSupply = await stableCoin.totalSupply();
+
+      expect(newSupply).to.equal(Number(oldSupply) * 0.95);
+      expect(await rebase.getParity()).to.equal(100);
+    });
+
+    it.only("Should adjust supply up", async function () {
+      const { rebase, stableCoin, oracle } = await loadFixture(deployFixture);
+
+      await rebase.deposit({ value: ONE_ETH });
+      const oldSupply = await stableCoin.totalSupply();
+      await oracle.setEthPrice(ETH_IN_CENTS * 1.05); //+5%
+      const newSupply = await stableCoin.totalSupply();
+
+      expect(newSupply).to.equal(Number(oldSupply) * 1.05);
+      expect(await rebase.getParity()).to.equal(100);
+    });
+
 
 
   });

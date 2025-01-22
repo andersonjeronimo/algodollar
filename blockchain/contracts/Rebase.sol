@@ -30,7 +30,8 @@ contract Rebase is Observer, Pausable, Ownable {
         //por exemplo: se $0.01 = 100 weis (wei ratio),
         //caso o msg.value for 200 weis,
         //serão mintados 2 tokens (considerando ratio = 100 weis p/ cada U$0.01);
-        IStableCoin(stablecoin).mint(msg.sender, msg.value / weiCentRatio);
+        uint amountUsda = msg.value / weiCentRatio;
+        IStableCoin(stablecoin).mint(msg.sender, amountUsda);
         adjustSupply();
         lastUpdate = block.timestamp;
     }
