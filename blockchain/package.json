@@ -6,7 +6,7 @@
   "scripts": {
     "test": "npx hardhat test",
     "compile": "npx hardhat compile",
-    "deploy": "npx hardhat ignition deploy ignition/modules/Oracle.module.ts --network local",
+    "deploy": "npx hardhat ignition deploy ignition/modules/AlgoDollar.module.ts --network local",
     "verify": "npx hardhat verify --network <network name> 0x0000000000000000000000000000000000"
   },
   "keywords": [],
