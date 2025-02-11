@@ -94,7 +94,7 @@ describe("Algodollar tests", function () {
       expect(await rebase.getParity()).to.equal(100);
     });
 
-    it.only("Should adjust supply up", async function () {
+    it("Should adjust supply up", async function () {
       const { rebase, stableCoin, oracle } = await loadFixture(deployFixture);
 
       await rebase.deposit({ value: ONE_ETH });
@@ -109,13 +109,6 @@ describe("Algodollar tests", function () {
 
 
   });
-
-
-
-
-
-
-
 
 
 

@@ -11,7 +11,7 @@ const AlgoDollarModule = buildModule("Algodollar", (m) => {
 
   const stablecoin = m.contract("StableCoin");
   const rebase = m.contract("Rebase");
-  const oracle = m.contract("Oracle", [ETH_PRICE_IN_CENTS]);  
+  const oracle = m.contract("Oracle", [ETH_PRICE_IN_CENTS]);
 
   m.call(rebase, "setStablecoin", [stablecoin]);
   m.call(rebase, "pause", []);
