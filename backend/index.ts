@@ -30,15 +30,16 @@ type TickerData = {
 }
 
 async function registerPrice() {
-    if (!lastReceivedPrice) {        
+    if (!lastReceivedPrice) {
         return console.log("Price not received yet.");
     }
     lastRegisteredPrice = lastReceivedPrice;
     lastRegisteredTimestamp = Date.now();
+    await Web3Service.setEthPrice(parseInt(`${lastReceivedPrice * 100}`));
     console.log("Price updated!");
 }
 
-const streamUrl = binance.websockets.prevDay("ETHUSDT", async (data: any, converted: TickerData) => {
+const streamUrl = binance.websockets.prevDay("MATICUSDT", async (data: any, converted: TickerData) => {
     lastReceivedPrice = converted.close;
     lastRegisteredTimestamp = Date.now();
     if (!lastRegisteredPrice) {
@@ -68,4 +69,15 @@ async function updateCycle() {
     await registerPrice();
 
 }
+
+//only for test
+setTimeout(updateCycle, 10000);
+
 setInterval(updateCycle, MAX_INTERVAL);
+ 
+setInterval(async () => {
+    const weiRatio = await Web3Service.getWeiRatio();
+    const parity = await Web3Service.getParity();
+    console.log(`Wei ratio: ${weiRatio}`);
+    console.log(`Parity: ${parity}`);
+}, 60 * 1000);

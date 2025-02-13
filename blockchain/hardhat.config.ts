@@ -6,7 +6,7 @@ import "@nomicfoundation/hardhat-toolbox";
 
 const config: HardhatUserConfig = {
   solidity: "0.8.28",
-  defaultNetwork: "local",
+  defaultNetwork: "amoy",
   networks: {
     local: {
       url: "http://127.0.0.1:8545",
